@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "779249781945",
+    "firebase_url": "https://lot-aegis-565cb.firebaseio.com",
+    "project_id": "lot-aegis-565cb",
+    "storage_bucket": "lot-aegis-565cb.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:779249781945:android:6b977cf3863c9152",
+        "android_client_info": {
+          "package_name": "com.bulwarkunlimited.lot_aegis_remastered"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "779249781945-in79hvnlvb9p39lsmscqakl8hu7f136c.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDjVGGyjAc7y6Ep879sDCTMMvk9gTCgk6w"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "779249781945-in79hvnlvb9p39lsmscqakl8hu7f136c.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
