@@ -43,9 +43,25 @@ class _HomePageState extends State<HomePage> {
       faceFile.deleteSync();
     }
     await _controller.takePicture(faceFile.path);
-    setState(() {
-      _faceImage = faceFile;
-    });
+    if (mounted) {
+      setState(() {
+        _faceImage = faceFile;
+      });
+    }
+  }
+
+  _getLicensePlateFromCamera() async {
+    File licensePlateFile =
+        File(_temporaryFolder.path + DateTime.now().toString());
+    if (licensePlateFile.existsSync()) {
+      licensePlateFile.deleteSync();
+    }
+    await _controller.takePicture(licensePlateFile.path);
+    if (mounted) {
+      setState(() {
+        _licensePlatesImage = licensePlateFile;
+      });
+    }
   }
 
   Widget _bottomIconFaceSegment() {
@@ -83,6 +99,41 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
+  Widget _bottomLicensePlateSegment() {
+    return _licensePlatesImage == null
+        ? IconButton(
+            icon: Icon(
+              Icons.camera,
+              color: Colors.red,
+            ),
+            onPressed: _getLicensePlateFromCamera,
+          )
+        : IconButton(
+            icon: Icon(
+              Icons.refresh,
+              color: Colors.orange,
+            ),
+            onPressed: () {
+              // TODO Delete the image from storage also
+              setState(() {
+                _licensePlatesImage = null;
+              });
+            },
+          );
+  }
+
+  Widget _licensePlateDataSegment() {
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: <Widget>[
+        _licensePlatesImage == null
+            ? CameraPreview(_controller)
+            : Image.file(_licensePlatesImage),
+        _bottomLicensePlateSegment()
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,36 +155,37 @@ class _HomePageState extends State<HomePage> {
               SizedBox(
                 height: MediaQuery.of(context).size.height / 2,
                 width: MediaQuery.of(context).size.width,
-                child: Stack(
-                  alignment: Alignment.bottomCenter,
-                  children: <Widget>[
-                    InkWell(
-                      onTap: null,
-                      child: _faceImage == null
-                          ? Material(
-                              color: Colors.purple,
-                              child: Center(
-                                child: Text("License Plate"),
-                              ),
-                            )
-                          : Image.file(_faceImage),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.refresh),
-                      color: Colors.orange,
-                      onPressed: () {
-                        showDialog(
-                          context: context,
-                          builder: (BuildContext context) {
-                            return AlertDialog(
-                              content: Image.file(_faceImage),
-                            );
-                          },
-                        );
-                      },
-                    ),
-                  ],
-                ),
+                child: _licensePlateDataSegment(),
+                // child: Stack(
+                //   alignment: Alignment.bottomCenter,
+                //   children: <Widget>[
+                //     InkWell(
+                //       onTap: null,
+                //       child: _faceImage == null
+                //           ? Material(
+                //               color: Colors.purple,
+                //               child: Center(
+                //                 child: Text("License Plate"),
+                //               ),
+                //             )
+                //           : Image.file(_faceImage),
+                //     ),
+                //     IconButton(
+                //       icon: Icon(Icons.refresh),
+                //       color: Colors.orange,
+                //       onPressed: () {
+                //         showDialog(
+                //           context: context,
+                //           builder: (BuildContext context) {
+                //             return AlertDialog(
+                //               content: Image.file(_faceImage),
+                //             );
+                //           },
+                //         );
+                //       },
+                //     ),
+                //   ],
+                // ),
               ),
             ],
           );
