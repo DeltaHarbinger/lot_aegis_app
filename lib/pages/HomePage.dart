@@ -1,5 +1,7 @@
 import 'dart:io';
 
+import 'package:flutter/services.dart';
+import './SubmissionPage.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:camera/camera.dart';
 import 'package:flutter/material.dart';
@@ -16,6 +18,20 @@ class _HomePageState extends State<HomePage> {
   List<Face> _faces;
   CameraController _controller;
   Directory _temporaryFolder;
+
+  bool _bothPicturesTaken() {
+    return this._faceImage != null && this._licensePlatesImage != null;
+  }
+
+  onPicturesTaken() {
+    if (_bothPicturesTaken()) {
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => SubmissionPage(_faceImage, _licensePlatesImage),
+        ),
+      );
+    }
+  }
 
   Future<List<CameraDescription>> _getAvailableCameras() async {
     return availableCameras();
@@ -48,6 +64,7 @@ class _HomePageState extends State<HomePage> {
         _faceImage = faceFile;
       });
     }
+    onPicturesTaken();
   }
 
   _getLicensePlateFromCamera() async {
@@ -62,6 +79,7 @@ class _HomePageState extends State<HomePage> {
         _licensePlatesImage = licensePlateFile;
       });
     }
+    onPicturesTaken();
   }
 
   Widget _bottomIconFaceSegment() {
@@ -81,6 +99,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               // TODO Delete the image from storage also
               setState(() {
+                _faceImage.deleteSync();
                 _faceImage = null;
               });
             },
@@ -116,6 +135,7 @@ class _HomePageState extends State<HomePage> {
             onPressed: () {
               // TODO Delete the image from storage also
               setState(() {
+                _licensePlatesImage.deleteSync();
                 _licensePlatesImage = null;
               });
             },
@@ -135,7 +155,13 @@ class _HomePageState extends State<HomePage> {
   }
 
   @override
+  void initState() {
+    super.initState();
+  }
+
+  @override
   Widget build(BuildContext context) {
+    SystemChrome.setEnabledSystemUIOverlays([]);
     return Scaffold(
       body: FutureBuilder(
         future: _initSequence(),
@@ -156,41 +182,17 @@ class _HomePageState extends State<HomePage> {
                 height: MediaQuery.of(context).size.height / 2,
                 width: MediaQuery.of(context).size.width,
                 child: _licensePlateDataSegment(),
-                // child: Stack(
-                //   alignment: Alignment.bottomCenter,
-                //   children: <Widget>[
-                //     InkWell(
-                //       onTap: null,
-                //       child: _faceImage == null
-                //           ? Material(
-                //               color: Colors.purple,
-                //               child: Center(
-                //                 child: Text("License Plate"),
-                //               ),
-                //             )
-                //           : Image.file(_faceImage),
-                //     ),
-                //     IconButton(
-                //       icon: Icon(Icons.refresh),
-                //       color: Colors.orange,
-                //       onPressed: () {
-                //         showDialog(
-                //           context: context,
-                //           builder: (BuildContext context) {
-                //             return AlertDialog(
-                //               content: Image.file(_faceImage),
-                //             );
-                //           },
-                //         );
-                //       },
-                //     ),
-                //   ],
-                // ),
               ),
             ],
           );
         },
       ),
+      floatingActionButton: _bothPicturesTaken()
+          ? FloatingActionButton(
+              child: Icon(Icons.send),
+              onPressed: onPicturesTaken,
+            )
+          : Container(),
     );
   }
 }
