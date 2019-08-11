@@ -38,20 +38,6 @@ class _HomePageState extends State<HomePage> {
   }
 
   _getFacesFromCamera() async {
-    // TODO: IMAGE FILE GOES HERE
-    // final imageFile = await ImagePicker.pickImage(
-    //   source: ImageSource.camera,
-    // );
-    //////////////////////////////////////////////
-    // File imageFile;
-    // print(imageFile.path);
-    // final image = FirebaseVisionImage.fromFile(imageFile);
-    // final faceDetector = FirebaseVision.instance.faceDetector(
-    //   FaceDetectorOptions(
-    //     mode: FaceDetectorMode.accurate,
-    //   ),
-    // );
-    // await faceDetector.detectInImage(image);
     File faceFile = File(_temporaryFolder.path + DateTime.now().toString());
     if (faceFile.existsSync()) {
       faceFile.deleteSync();
@@ -60,12 +46,41 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _faceImage = faceFile;
     });
-    //////////////////////////////////
-    // if (mounted) {
-    //   setState(() {
-    //     _faceImage = imageFile;
-    //   });
-    // }
+  }
+
+  Widget _bottomIconFaceSegment() {
+    return _faceImage == null
+        ? IconButton(
+            icon: Icon(
+              Icons.camera,
+              color: Colors.blue,
+            ),
+            onPressed: _getFacesFromCamera,
+          )
+        : IconButton(
+            icon: Icon(
+              Icons.refresh,
+              color: Colors.orange,
+            ),
+            onPressed: () {
+              // TODO Delete the image from storage also
+              setState(() {
+                _faceImage = null;
+              });
+            },
+          );
+  }
+
+  Widget _faceDataSegment() {
+    return Stack(
+      alignment: Alignment.bottomCenter,
+      children: <Widget>[
+        _faceImage == null
+            ? CameraPreview(_controller)
+            : Image.file(_faceImage),
+        _bottomIconFaceSegment()
+      ],
+    );
   }
 
   @override
@@ -84,19 +99,7 @@ class _HomePageState extends State<HomePage> {
               SizedBox(
                 height: MediaQuery.of(context).size.height / 2,
                 width: MediaQuery.of(context).size.width,
-                child: Stack(
-                  alignment: Alignment.bottomCenter,
-                  children: <Widget>[
-                    CameraPreview(_controller),
-                    IconButton(
-                      icon: Icon(
-                        Icons.camera,
-                        color: Colors.blue,
-                      ),
-                      onPressed: _getFacesFromCamera(),
-                    ),
-                  ],
-                ),
+                child: _faceDataSegment(),
               ),
               SizedBox(
                 height: MediaQuery.of(context).size.height / 2,
